@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Fluentd plugin for GlusterFS}
   gem.summary       = %q{Fluentd plugin for GlusterFS}
   gem.homepage      = "https://github.com/keithseahus/fluent-plugin-glusterfs"
-  gem.version       = "1.0.0"
+  gem.version       = "1.0.1"
   gem.license       = "Apache 2.0"
 
   gem.files         = `git ls-files`.split($\)
@@ -16,8 +16,5 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  requires = ['fluentd']
-  requires.each {|name| gem.add_runtime_dependency name}
-  requires += ['rake']
-  requires.each {|name| gem.add_development_dependency name}
+  add_runtime_dependency 'fluentd', '>= 0', '>= 0'
 end
