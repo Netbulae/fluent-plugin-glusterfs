@@ -65,8 +65,6 @@ module Fluent
       begin
         return nil, nil unless line[0,1] == '['
 
-        time = 0
-        record = {}
         if @regex =~ line
           record = {
             @field[:date] => $1,
@@ -94,6 +92,8 @@ module Fluent
           }
           time = now.to_i
         end
+
+        $log.info "Glusterfs_log: time: #{time.inspect} record: #{record.inspect}"
 
         return time, record
       rescue => ex
