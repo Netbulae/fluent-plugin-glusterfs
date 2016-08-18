@@ -93,7 +93,7 @@ module Fluent
           time = now.to_i
         end
 
-        $log.info "Glusterfs_log: time: #{time.inspect} record: #{record.inspect}"
+        #$log.info "Glusterfs_log: time: #{time.inspect} record: #{record.inspect}"
 
         return time, record
       rescue => ex
