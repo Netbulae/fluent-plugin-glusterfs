@@ -60,7 +60,7 @@ module Fluent
     end
 
     def parse_line(line)
-      super
+      time, record = super(line)
 
       begin
         return nil, nil unless line[0,1] == '['
@@ -95,9 +95,7 @@ module Fluent
           time = now.to_i
         end
 
-        router.emit(@tag, time, record)
-
-        #return time, record
+        return time, record
       rescue => ex
         raise ex
       end
