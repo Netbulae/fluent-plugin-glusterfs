@@ -5,9 +5,12 @@ module Fluent
   class GlusterfsLogInput < TailInput
     Plugin.register_input("glusterfs_log", self)
 
-    # NOTE: Here you can specify log levels
-    #   to retrieve in the log. (:default => 'TDINWECA')
+    config_param :tag, :string, :default => nil
     config_param :gluster_log_level, :string, :default => 'TDINWECA'
+
+    unless method_defined?(:log)
+      define_method(:log) { $log }
+    end
 
     def initialize
       super
@@ -19,16 +22,16 @@ module Fluent
       # NOTE: Here you can configure field names of JSON.
       #   YOU SHOULD NOT SPECIFY EACH STRING AS NIL.
       field ||= {
-        :date => 'date',
-        :time => 'time',
-        :time_usec => 'time_usec',
-        :gluster_log_level => 'gluster_log_level',
-        :source_file_name => 'source_file_name',
-        :source_line => 'source_line',
-        :function_name => 'function_name',
-        :component_name => 'component_name',
-        :message => 'message',
-        :hostname => 'hostname'
+          :date => 'date',
+          :time => 'time',
+          :time_usec => 'time_usec',
+          :gluster_log_level => 'gluster_log_level',
+          :source_file_name => 'source_file_name',
+          :source_line => 'source_line',
+          :function_name => 'function_name',
+          :component_name => 'component_name',
+          :message => 'message',
+          :hostname => 'hostname'
       }
 
       # NOTE: Here you can set an optional hostname in string which is
@@ -39,6 +42,21 @@ module Fluent
       @field = init_field(field)
       @time_format = init_time_format
       @regex = init_regex
+    end
+
+    # This method is called before starting.
+    # 'conf' is a Hash that includes configuration parameters.
+    # If the configuration is invalid, raise Fluent::ConfigError.
+    def configure(conf)
+      super
+
+      unless @tag
+        raise ConfigError, "'tag' option is required on glusterfs_log input"
+      end
+
+      @gluster_log_level = conf['gluster_log_level'] || 'TDINWECA'
+
+      $log.debug "Glusterfs_log configuration: gluster_log_level = #{@gluster_log_level}"
     end
 
     def parse_line(line)
@@ -77,7 +95,9 @@ module Fluent
           time = now.to_i
         end
 
-        return time, record
+        router.emit(@tag, time, record)
+
+        #return time, record
       rescue => ex
         raise ex
       end
@@ -98,7 +118,6 @@ module Fluent
     end
 
     def init_regex
-      @gluster_log_level = 'TDINWECA' unless @gluster_log_level
       delimiter = '\[\]: '
       re = {
         :date => '\d{4}-[01]\d-[0-3]\d',
