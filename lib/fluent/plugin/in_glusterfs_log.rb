@@ -2,7 +2,7 @@ module Fluent
   require 'fluent/plugin/in_tail'
   require 'socket'
 
-  class GlusterfsLogInput < TailInput
+  class GlusterfsLogInput < Fluent::Plugin::TailInput
     Plugin.register_input("glusterfs_log", self)
 
     # NOTE: Here you can specify log levels
